@@ -1,29 +1,29 @@
-# XTTSv2 Finetuning Guide for New Languages
+# Hướng Dẫn Finetuning XTTSv2 cho Ngôn Ngữ Mới
 
-This guide provides instructions for finetuning XTTSv2 on a new language, using Vietnamese (`vi`) as an example.
+Hướng dẫn này cung cấp các bước chi tiết để finetuning XTTSv2 trên một ngôn ngữ mới, sử dụng tiếng Việt (`vi`) làm ví dụ.
 
-## Table of Contents
-1. [Installation](#1-installation)
-2. [Data Preparation](#2-data-preparation)
-3. [Pretrained Model Download](#3-pretrained-model-download)
-4. [Vocabulary Extension and Configuration Adjustment](#4-vocabulary-extension-and-configuration-adjustment)
-5. [DVAE Finetuning (Optional)](#5-dvae-finetuning-optional)
-6. [GPT Finetuning](#6-gpt-finetuning)
-7. [Usage Example](#7-usage-example)
+## Mục Lục
+1. [Cài Đặt](#1-cai-dat)
+2. [Chuẩn Bị Dữ Liệu](#2-chuan-bi-du-lieu)
+3. [Tải Mô Hình Pretrained](#3-tai-mo-hinh-pretrained)
+4. [Mở Rộng Từ Vựng và Điều Chỉnh Cấu Hình](#4-mo-rong-tu-vung-va-dieu-chinh-cau-hinh)
+5. [Finetuning DVAE (Tùy Chọn)](#5-finetuning-dvae-tuy-chon)
+6. [Finetuning GPT](#6-finetuning-gpt)
+7. [Ví Dụ Sử Dụng](#7-vi-du-su-dung)
 
-## 1. Installation
+## 1. Cài Đặt
 
-First, clone the repository and install the necessary dependencies:
+Trước tiên, clone kho lưu trữ và cài đặt các thư viện cần thiết:
 
 ```
-git clone https://github.com/nguyenhoanganh2002/XTTSv2-Finetuning-for-New-Languages.git
+git clone https://github.com/PineappleCuteCute/XTTSv2-Finetuning-for-New-Languages-Update.git
 cd XTTSv2-Finetuning-for-New-Languages
 pip install -r requirements.txt
 ```
 
-## 2. Data Preparation
+## 2. Chuẩn Bị Dữ Liệu
 
-Ensure your data is organized as follows:
+Hãy chắc chắn dữ liệu của bạn được tổ chức như sau:
 
 ```
 project_root/
@@ -42,7 +42,7 @@ project_root/
 └── README.md
 ```
 
-Format your `metadata_train.csv` and `metadata_eval.csv` files as follows:
+Định dạng các file `metadata_train.csv` và `metadata_eval.csv` như sau:
 
 ```
 audio_file|text|speaker_name
@@ -51,25 +51,25 @@ wavs/yyy.wav|Nice to meet you.|@Y
 wavs/zzz.wav|Good to see you.|@Z
 ```
 
-## 3. Pretrained Model Download
+## 3. Tải Mô Hình Pretrained
 
-Execute the following command to download the pretrained model:
+Chạy lệnh sau để tải mô hình pretrained:
 
 ```bash
 python download_checkpoint.py --output_path checkpoints/
 ```
 
-## 4. Vocabulary Extension and Configuration Adjustment
+## 4. Mở Rộng Từ Vựng và Điều Chỉnh Cấu Hình
 
-Extend the vocabulary and adjust the configuration with:
+Mở rộng từ vựng và điều chỉnh cấu hình với lệnh sau:
 
 ```bash
 python extend_vocab_config.py --output_path=checkpoints/ --metadata_path datasets/metadata_train.csv --language vi --extended_vocab_size 2000
 ```
 
-## 5. DVAE Finetuning (Optional)
+## 5. Finetuning DVAE (Tùy Chọn)
 
-To finetune the DVAE, run:
+Để finetuning DVAE, chạy lệnh sau:
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python train_dvae_xtts.py \
@@ -82,9 +82,9 @@ CUDA_VISIBLE_DEVICES=0 python train_dvae_xtts.py \
 --lr=5e-6
 ```
 
-## 6. GPT Finetuning
+## 6. Finetuning GPT
 
-For GPT finetuning, execute:
+Để finetuning GPT, chạy lệnh:
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python train_gpt_xtts.py \
@@ -102,9 +102,9 @@ CUDA_VISIBLE_DEVICES=0 python train_gpt_xtts.py \
 --save_step=2000
 ```
 
-## 7. Usage Example
+## 7. Ví Dụ Sử Dụng
 
-Here's a sample code snippet demonstrating how to use the finetuned model:
+Dưới đây là đoạn mã mẫu minh họa cách sử dụng mô hình đã được finetuning:
 
 ```python
 import torch
@@ -115,24 +115,24 @@ from underthesea import sent_tokenize
 from TTS.tts.configs.xtts_config import XttsConfig
 from TTS.tts.models.xtts import Xtts
 
-# Device configuration
-device = "cuda:0" if torch.cuda.is_available() else "cpu"
+# Cấu hình thiết bị
+device = "cuda:0" nếu torch.cuda.is_available() khác "cpu"
 
-# Model paths
+# Đường dẫn mô hình
 xtts_checkpoint = "checkpoints/GPT_XTTS_FT-August-30-2024_08+19AM-6a6b942/best_model_99875.pth"
 xtts_config = "checkpoints/GPT_XTTS_FT-August-30-2024_08+19AM-6a6b942/config.json"
 xtts_vocab = "checkpoints/XTTS_v2.0_original_model_files/vocab.json"
 
-# Load model
+# Tải mô hình
 config = XttsConfig()
 config.load_json(xtts_config)
 XTTS_MODEL = Xtts.init_from_config(config)
 XTTS_MODEL.load_checkpoint(config, checkpoint_path=xtts_checkpoint, vocab_path=xtts_vocab, use_deepspeed=False)
 XTTS_MODEL.to(device)
 
-print("Model loaded successfully!")
+print("Tải mô hình thành công!")
 
-# Inference
+# Suy luận
 tts_text = "Good to see you."
 speaker_audio_file = "ref.wav"
 lang = "vi"
@@ -163,9 +163,9 @@ for text in tqdm(tts_texts):
 
 out_wav = torch.cat(wav_chunks, dim=0).unsqueeze(0).cpu()
 
-# Play audio (for Jupyter Notebook)
+# Phát âm thanh (trong Jupyter Notebook)
 from IPython.display import Audio
 Audio(out_wav, rate=24000)
 ```
 
-Note: Finetuning the HiFiGAN decoder was attempted but resulted in worse performance. DVAE and GPT finetuning are sufficient for optimal results.
+Lưu ý: Finetuning HiFiGAN decoder đã được thử nghiệm nhưng cho kết quả kém hơn. Việc finetuning DVAE và GPT là đủ để đạt được hiệu quả tối ưu.
